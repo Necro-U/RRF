@@ -4,7 +4,7 @@ from utils.color import Color
 from pygame import Rect
 
 pygame.init()
-size = width, height = 620, 620
+size = width, height = 600, 600
 speed = [1, 1]
 black = 0, 0, 0
 
@@ -14,7 +14,7 @@ grid_rate = 20
 
 
 # selecting items
-selected_count = -1
+selected_count = 0
 
 
 screen = pygame.display.set_mode(size)
@@ -43,8 +43,8 @@ def mouse_handler(count: int):
                     item.assign_as_first()
                 elif count == 1:
                     item.assign_as_last()
-                else:
-                    item.visit()
+                # else:
+                #     item.visit()
                 print(item.color, item.start_coordinate, item.finish_coordinate)
 
 
@@ -54,9 +54,7 @@ for i in range(0, height, grid_rate):
     temp = []
     temp_rect = []
     for j in range(0, width, grid_rate):
-        grid = Grid(
-            (i, j),
-        )
+        grid = Grid((i, j), grid_rate)
         temp.append(grid)
     grid_list.append(temp)
 
@@ -65,7 +63,7 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN or pygame.mouse.get_pressed()[0]:
+        if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
             x, y = pygame.mouse.get_pos()
             print(x, y)
             mouse_handler(selected_count)
