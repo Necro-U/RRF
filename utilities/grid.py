@@ -1,5 +1,4 @@
-from utils.color import Color
-
+from .color import Color
 
 # TODO grids needs to have neighbours
 

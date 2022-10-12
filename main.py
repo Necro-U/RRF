@@ -1,7 +1,7 @@
 import sys, pygame
-from utils.grid import Grid
-from utils.color import Color
-from pygame import Rect
+from utilities.color import Color
+from utilities.grid import Grid
+from pygame import Rect, Surface
 
 pygame.init()
 size = width, height = 600, 600
@@ -35,7 +35,7 @@ def grid_drawer():
             )
 
 
-def mouse_handler(count: int):
+def grid_mouse_handler(count: int, x: int, y: int):
     for row in grid_list:
         for item in row:
             if item.isclicked(x, y):
@@ -48,15 +48,28 @@ def mouse_handler(count: int):
                 print(item.color, item.start_coordinate, item.finish_coordinate)
 
 
-# Creating grids
+def create_grids(grid_list: list[list[Grid]]):
+    for i in range(0, height, grid_rate):
+        temp = []
+        temp_rect = []
+        for j in range(0, width, grid_rate):
+            grid = Grid((i, j), grid_rate)
+            temp.append(grid)
+        grid_list.append(temp)
 
-for i in range(0, height, grid_rate):
-    temp = []
-    temp_rect = []
-    for j in range(0, width, grid_rate):
-        grid = Grid((i, j), grid_rate)
-        temp.append(grid)
-    grid_list.append(temp)
+
+# Creating grids
+# create_grids(grid_list)
+
+
+# Non-grid functions
+
+# define a class
+def mouse_handler(root: Surface, pos: tuple[int, int], selected: int):
+    if selected == 0:
+        pygame.draw.circle(root, Color.GREEN, pos, 5)
+    elif selected == 1:
+        pygame.draw.circle(root, Color.RED, pos, 5)
 
 
 while 1:
@@ -64,12 +77,15 @@ while 1:
         if event.type == pygame.QUIT:
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-            x, y = pygame.mouse.get_pos()
+            pos = x, y = pygame.mouse.get_pos()
             print(x, y)
-            mouse_handler(selected_count)
+            mouse_handler(screen, pos, selected_count)
+            # grid_mouse_handler(selected_count)
             if selected_count != 3:
                 selected_count += 1
 
-    grid_drawer()
-    line_drawer()
+    # Grid Funcsions
+    # grid_drawer()
+    # line_drawer()
+
     pygame.display.flip()
