@@ -1,12 +1,18 @@
+from random import randint
 import sys, pygame
+from utilities.VertexManager import VertexManager
 from utilities.color import Color
 from utilities.grid import Grid
 from pygame import Rect, Surface
+from utilities.vector import Vector
+
+from utilities.vertex import Vertex
 
 pygame.init()
 size = width, height = 600, 600
 speed = [1, 1]
 black = 0, 0, 0
+
 
 # grid items
 grid_list: list[list[Grid]] = []
@@ -18,6 +24,11 @@ selected_count = 0
 
 
 screen = pygame.display.set_mode(size)
+
+
+# Vector Manager
+manager = VertexManager(screen)
+
 
 # Local functions
 def line_drawer():
@@ -72,6 +83,15 @@ def mouse_handler(root: Surface, pos: tuple[int, int], selected: int):
         pygame.draw.circle(root, Color.RED, pos, 5)
 
 
+def rrf(start: Vertex, end: Vertex):
+    manager.add_vertex(start)
+    # manager.add_vertex(end)
+
+    x = randint(0, width)
+    y = randint(0, height)
+    manager.add_vertex(Vertex(Vector([x, y])))
+
+
 while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -81,9 +101,17 @@ while 1:
             print(x, y)
             mouse_handler(screen, pos, selected_count)
             # grid_mouse_handler(selected_count)
-            if selected_count != 3:
+            if selected_count != 2:
+                match selected_count:
+                    case 0:
+                        start = Vertex(Vector(pos))
+                    case 1:
+                        end = Vertex(Vector(pos))
                 selected_count += 1
+            else:
+                rrf(start, end)
 
+    manager.draw_lines()
     # Grid Funcsions
     # grid_drawer()
     # line_drawer()
