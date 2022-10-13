@@ -27,8 +27,7 @@ screen = pygame.display.set_mode(size)
 
 
 # Vector Manager
-manager = VertexManager(screen)
-
+manager = VertexManager(screen, width, height)
 
 # Local functions
 def line_drawer():
@@ -89,7 +88,11 @@ def rrf(start: Vertex, end: Vertex):
 
     x = randint(0, width)
     y = randint(0, height)
+    print(x, y)
     manager.add_vertex(Vertex(Vector([x, y])))
+
+
+rrf_starter = False
 
 
 while 1:
@@ -97,21 +100,25 @@ while 1:
         if event.type == pygame.QUIT:
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-            pos = x, y = pygame.mouse.get_pos()
-            print(x, y)
+            x, y = pygame.mouse.get_pos()
+            pos = [x, y]
+            # print(x, y)
             mouse_handler(screen, pos, selected_count)
             # grid_mouse_handler(selected_count)
             if selected_count != 2:
                 match selected_count:
                     case 0:
-                        start = Vertex(Vector(pos))
+                        print(pos)
+                        start = pos
                     case 1:
-                        end = Vertex(Vector(pos))
+                        print(pos)
+                        end = pos
                 selected_count += 1
             else:
-                rrf(start, end)
+                rrf_starter = True
 
-    manager.draw_lines()
+    if rrf_starter:
+        manager.start_rrf(start, end)
     # Grid Funcsions
     # grid_drawer()
     # line_drawer()
