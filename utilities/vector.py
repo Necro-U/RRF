@@ -17,7 +17,7 @@ class Vector:
 
     def __sub__(self, other):
         match other:
-            case Vector(pos):
+            case Vector():
                 return Vector(self.x - other.x, self.y - other.y)
             case _:
                 raise Exception(

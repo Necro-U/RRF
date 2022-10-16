@@ -1,4 +1,3 @@
-from multiprocessing import Lock
 import threading
 from time import sleep
 

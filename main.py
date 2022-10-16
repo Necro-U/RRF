@@ -1,15 +1,11 @@
-from random import randint
-from re import search
 import sys, pygame
 from threading import Thread
 from utilities.VertexManager import VertexManager
 from utilities.color import Color
 from utilities.grid import Grid
-from pygame import Rect, Surface
-from utilities.vector import Vector
+from pygame.surface import Surface
 from threading import RLock
 
-from utilities.vertex import Vertex
 
 # TODO Threading eklenmeli
 pygame.init()
@@ -50,7 +46,7 @@ searcher = Thread(target=manager.start_rrf, args=[start, end])
 # Non-grid functions
 
 # define a class
-def mouse_handler(root: Surface, pos: tuple[int, int], selected: int):
+def mouse_handler(root: Surface, pos: list[int], selected: int):
     if selected == 0:
         pygame.draw.circle(root, Color.GREEN, pos, 5)
     elif selected == 1:

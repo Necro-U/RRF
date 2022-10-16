@@ -1,9 +1,8 @@
 from random import randint
 from time import sleep
 from utilities.color import Color
-from utilities.vector import Vector
 from utilities.vertex import Vertex
-from pygame import Surface
+from pygame.surface import Surface
 from threading import RLock, Thread
 import pygame
 
@@ -15,10 +14,10 @@ class VertexManager:
         self.width = width
         self.height = height
         self.rrf_finisher = False
-        self.aim: Vertex = None
+        self.aim: Vertex | None = None
         self.max_dist = 100
 
-    def finish(self, point, vertex: Vertex):
+    def finish(self, vertex: Vertex):
         self.rrf_finisher = True
         self.aim = vertex
 
@@ -53,7 +52,7 @@ class VertexManager:
                         )
             else:
                 temp = self.aim
-                while temp.parent_vertex != None:
+                while temp and temp.parent_vertex != None:
                     pygame.draw.line(
                         self.root,
                         Color.GREEN,
@@ -64,13 +63,14 @@ class VertexManager:
                     pygame.draw.circle(self.root, Color.YELLOW, temp.position.pos, 3)
                     temp = temp.parent_vertex
 
-    def find_closest_vertex(self, new_vertex: Vertex) -> Vertex:
-        if len(self.vertex_list) <= 1:
+    def find_closest_vertex(self, new_vertex: Vertex) -> Vertex | None:
+        if len(self.vertex_list) < 1:
             return None
         key = lambda x: (x - new_vertex).distance
         closest = min(self.vertex_list, key=key)
         distance = (new_vertex - closest).distance
         # print(closest.position.pos)
+        # TODO! : distance fazla olursa modifite et!!
         if distance < self.max_dist:
             return closest
         return None
@@ -83,7 +83,7 @@ class VertexManager:
             self.vertex_list.append(Vertex(x_s, y_s, isinitial=True))
             pos = x, y = [randint(0, self.width), randint(0, self.height)]
             while pos != end_point:
-                sleep(0.0001)
+                sleep(0.1)
 
                 with lock:
 
@@ -96,7 +96,7 @@ class VertexManager:
 
                     if pos == end_point:
                         print("endğpos", pos)
-                        self.finish(pos, new)
+                        self.finish(new)
                     #     break
                     self.add_vertex(new)
 
