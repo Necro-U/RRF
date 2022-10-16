@@ -1,14 +1,19 @@
-from utilities.VertexManager import VertexManager
-from utilities.vertex import Vertex
-from utilities.vector import Vector
+from multiprocessing import Lock
+import threading
+from time import sleep
 
 
-a = Vector([12, 12])
-b = Vector([25, 25])
-a = Vertex(a)
-b = Vertex(b)
-# print((a - b).distance)
-manager = VertexManager()
-manager.add_vertex(a)
-manager.add_vertex(b)
-manager.find_closest_vertex(Vertex(Vector([13, 13])))
+class deneme:
+    def func(self):
+        print("sea")
+        sleep(1)
+        print("ase")
+
+    def run(self):
+        func = threading.Thread(target=self.func)
+        func.start()
+
+
+a = deneme()
+
+a.run()

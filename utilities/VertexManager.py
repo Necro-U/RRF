@@ -3,6 +3,7 @@ from utilities.color import Color
 from utilities.vector import Vector
 from utilities.vertex import Vertex
 from pygame import Surface
+from threading import Thread
 import pygame
 
 
@@ -13,6 +14,12 @@ class VertexManager:
         self.width = width
         self.height = height
         self.rrf_finisher = False
+        self.aim: Vertex = None
+        self.max_dist = 100
+
+    def finish(self, point, vertex: Vertex):
+        self.rrf_finisher = True
+        self.aim = vertex
 
     def add_vertex(self, vertex: Vertex):
         if not len(self.vertex_list):
@@ -25,44 +32,66 @@ class VertexManager:
         vertex.parent_vertex = parent
         self.vertex_list.append(vertex)
 
+    # Needs to be changed
     def draw_lines(self):
-        for vertex in self.vertex_list:
-            if not vertex.children_vertexes:
-                continue
+        if not self.rrf_finisher:
+            for vertex in self.vertex_list:
+                if not vertex.children_vertexes:
+                    continue
 
-            for each in vertex.children_vertexes:
-                # print(f"vertex list {self.vertex_list}")
+                for each in vertex.children_vertexes:
+                    # print(f"vertex list {self.vertex_list}")
+                    pygame.draw.line(
+                        self.root,
+                        Color.PURPLE,
+                        vertex.get_pos(),
+                        each.get_pos(),
+                        width=2,
+                    )
+        else:
+            temp = self.aim
+            while temp.parent_vertex != None:
                 pygame.draw.line(
-                    self.root, Color.PURPLE, vertex.get_pos(), each.get_pos(), width=2
+                    self.root,
+                    Color.GREEN,
+                    temp.position.pos,
+                    temp.parent_vertex.position.pos,
+                    width=2,
                 )
+                pygame.draw.circle(self.root, Color.YELLOW, temp.position.pos, 3)
+                temp = temp.parent_vertex
 
     def find_closest_vertex(self, new_vertex: Vertex) -> Vertex:
         if len(self.vertex_list) <= 1:
             return None
         key = lambda x: (x - new_vertex).distance
         closest = min(self.vertex_list, key=key)
+        distance = (new_vertex - closest).distance
         # print(closest.position.pos)
-        return closest
+        if distance < self.max_dist:
+            return closest
+        return None
 
-    def start_rrf(self, start_point: list, end_point: list):
+    # TODO Maximum uzaklık ekle
+    def start_rrf(self, start_point: list[int], end_point: list[int]):
+        x_s, y_s = start_point
         if not self.rrf_finisher:
-            self.vertex_list.append(Vertex(Vector(start_point), isinitial=True))
-            pos = [randint(0, self.width), randint(0, self.height)]
-            new = Vertex(Vector(pos))
-            closest = self.find_closest_vertex(new)
-            if closest:
-                closest.add_child(new)
-                #     continue
+            self.vertex_list.append(Vertex(x_s, y_s, isinitial=True))
+            pos = x, y = [randint(0, self.width), randint(0, self.height)]
+            while pos != end_point:
+                new = Vertex(x, y)
+                closest = self.find_closest_vertex(new)
+                if closest:
+                    closest.add_child(new)
+                    new.set_parent(closest)
+                    #     continue
 
-            if pos == end_point:
-                print("endğpos", pos)
-                self.rrf_finisher = True
-            #     # self.finis() # we can change the colors
-            #     break
-            self.add_vertex(new)
-        else:
-            # the looking up logic need to be change
-            # while new.parent != None :
-            print("finded")
+                if pos == end_point:
+                    print("endğpos", pos)
+                    self.finish(pos, new)
+                #     break
+                self.add_vertex(new)
 
-        self.draw_lines()
+    def run(self, start_point: list[int], end_point):
+        func = Thread(target=self.start_rrf, args=[start_point, end_point])
+        func.start()

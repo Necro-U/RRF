@@ -2,10 +2,10 @@ from utilities.vector import Vector
 
 
 class Vertex:
-    def __init__(self, position: Vector, isinitial=False) -> None:
-        self.position = position
+    def __init__(self, x: int, y: int, isinitial=False, parent=None) -> None:
+        self.position = Vector(x, y)
         self.is_initial = isinitial
-        self.parent_vertex: Vertex = None
+        self.parent_vertex: Vertex = parent
         self.children_vertexes: list[Vertex] = []
 
     def get_pos(self) -> list:
@@ -13,6 +13,9 @@ class Vertex:
 
     def add_child(self, vertex):
         self.children_vertexes.append(vertex)
+
+    def set_parent(self, parent):
+        self.parent_vertex = parent
 
     def __sub__(self, other: object):
         return self.position - other.position
