@@ -1,9 +1,10 @@
 from random import randint
+from time import sleep
 from utilities.color import Color
 from utilities.vector import Vector
 from utilities.vertex import Vertex
 from pygame import Surface
-from threading import Thread
+from threading import RLock, Thread
 import pygame
 
 
@@ -33,33 +34,35 @@ class VertexManager:
         self.vertex_list.append(vertex)
 
     # Needs to be changed
-    def draw_lines(self):
-        if not self.rrf_finisher:
-            for vertex in self.vertex_list:
-                if not vertex.children_vertexes:
-                    continue
+    def draw_lines(self, lock: RLock):
+        with lock:
 
-                for each in vertex.children_vertexes:
-                    # print(f"vertex list {self.vertex_list}")
+            if not self.rrf_finisher:
+                for vertex in self.vertex_list:
+                    if not vertex.children_vertexes:
+                        continue
+
+                    for each in vertex.children_vertexes:
+                        # print(f"vertex list {self.vertex_list}")
+                        pygame.draw.line(
+                            self.root,
+                            Color.PURPLE,
+                            vertex.get_pos(),
+                            each.get_pos(),
+                            width=2,
+                        )
+            else:
+                temp = self.aim
+                while temp.parent_vertex != None:
                     pygame.draw.line(
                         self.root,
-                        Color.PURPLE,
-                        vertex.get_pos(),
-                        each.get_pos(),
+                        Color.GREEN,
+                        temp.position.pos,
+                        temp.parent_vertex.position.pos,
                         width=2,
                     )
-        else:
-            temp = self.aim
-            while temp.parent_vertex != None:
-                pygame.draw.line(
-                    self.root,
-                    Color.GREEN,
-                    temp.position.pos,
-                    temp.parent_vertex.position.pos,
-                    width=2,
-                )
-                pygame.draw.circle(self.root, Color.YELLOW, temp.position.pos, 3)
-                temp = temp.parent_vertex
+                    pygame.draw.circle(self.root, Color.YELLOW, temp.position.pos, 3)
+                    temp = temp.parent_vertex
 
     def find_closest_vertex(self, new_vertex: Vertex) -> Vertex:
         if len(self.vertex_list) <= 1:
@@ -73,24 +76,29 @@ class VertexManager:
         return None
 
     # TODO Maximum uzaklık ekle
-    def start_rrf(self, start_point: list[int], end_point: list[int]):
+    def start_rrf(self, start_point: list[int], end_point: list[int], lock: RLock):
+
         x_s, y_s = start_point
         if not self.rrf_finisher:
             self.vertex_list.append(Vertex(x_s, y_s, isinitial=True))
             pos = x, y = [randint(0, self.width), randint(0, self.height)]
             while pos != end_point:
-                new = Vertex(x, y)
-                closest = self.find_closest_vertex(new)
-                if closest:
-                    closest.add_child(new)
-                    new.set_parent(closest)
-                    #     continue
+                sleep(0.0001)
 
-                if pos == end_point:
-                    print("endğpos", pos)
-                    self.finish(pos, new)
-                #     break
-                self.add_vertex(new)
+                with lock:
+
+                    new = Vertex(x, y)
+                    closest = self.find_closest_vertex(new)
+                    if closest:
+                        closest.add_child(new)
+                        new.set_parent(closest)
+                        #     continue
+
+                    if pos == end_point:
+                        print("endğpos", pos)
+                        self.finish(pos, new)
+                    #     break
+                    self.add_vertex(new)
 
     def run(self, start_point: list[int], end_point):
         func = Thread(target=self.start_rrf, args=[start_point, end_point])

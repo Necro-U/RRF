@@ -7,6 +7,7 @@ from utilities.color import Color
 from utilities.grid import Grid
 from pygame import Rect, Surface
 from utilities.vector import Vector
+from threading import RLock
 
 from utilities.vertex import Vertex
 
@@ -17,6 +18,10 @@ speed = [1, 1]
 black = 0, 0, 0
 start = [0, 0]
 end = [0, 0]
+
+lock = RLock()
+
+clock = pygame.time.Clock()
 
 # grid items
 grid_list: list[list[Grid]] = []
@@ -58,7 +63,11 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+        if (
+            event.type == pygame.MOUSEBUTTONDOWN
+            and pygame.mouse.get_pressed()[0]
+            and not rrf_starter
+        ):
             x, y = pygame.mouse.get_pos()
             pos = [x, y]
             mouse_handler(screen, pos, selected_count)
@@ -75,11 +84,13 @@ while 1:
                 rrf_starter = True
 
     if rrf_starter:
-        Thread(target=manager.start_rrf, args=[start, end]).start()
+        rrf_starter = False
+        print("thread initialized..")
+        Thread(target=manager.start_rrf, args=[start, end, lock]).start()
 
-    Thread(target=manager.draw_lines).start()
-
+    manager.draw_lines(lock)
     pygame.display.flip()
+    clock.tick(60)
 
 
 # Local functions
