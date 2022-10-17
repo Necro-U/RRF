@@ -3,6 +3,11 @@ from time import sleep
 
 
 class deneme:
+    __slots__ = ["x", "b"]
+
+    def __init__(self) -> None:
+        self.x = 5
+
     def func(self):
         print("sea")
         sleep(1)
@@ -15,4 +20,6 @@ class deneme:
 
 a = deneme()
 
-a.run()
+a.b = 7
+
+print(a.b)

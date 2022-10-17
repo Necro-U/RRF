@@ -15,10 +15,14 @@ class Vector:
     def pos(self):
         return [self.x, self.y]
 
+    def direction(self, other):
+        length = sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)
+        return Vector((self.x - other.x) / length, (self.y - other.y) / length)
+
     def __sub__(self, other):
         match other:
-            case Vector():
-                return Vector(self.x - other.x, self.y - other.y)
+            case Vector(x, y):
+                return Vector(self.x - x, self.y - y)
             case _:
                 raise Exception(
                     f"Second argument needs to be an Vector object you send {type(other)}"

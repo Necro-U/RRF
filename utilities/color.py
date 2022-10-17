@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(slots=True)
 class Color:
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)

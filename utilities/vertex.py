@@ -8,7 +8,7 @@ class Vertex:
         self.parent_vertex: Vertex | None = parent
         self.children_vertexes: list[Vertex] = []
 
-    def get_pos(self) -> list:
+    def get_pos(self) -> list[int]:
         return self.position.pos
 
     def add_child(self, vertex):

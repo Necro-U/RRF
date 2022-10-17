@@ -5,6 +5,7 @@ from utilities.color import Color
 from utilities.grid import Grid
 from pygame.surface import Surface
 from threading import RLock
+from utilities.globals import RADIUS
 
 
 # TODO Threading eklenmeli
@@ -35,8 +36,8 @@ screen = pygame.display.set_mode(size)
 manager = VertexManager(screen, width, height)
 
 # threads
-drawer = Thread(target=manager.draw_lines)
-searcher = Thread(target=manager.start_rrf, args=[start, end])
+# drawer = Thread(target=manager.draw_lines)
+# searcher = Thread(target=manager.start_rrf, args=[start, end, lock])
 
 #
 # Creating grids
@@ -48,9 +49,9 @@ searcher = Thread(target=manager.start_rrf, args=[start, end])
 # define a class
 def mouse_handler(root: Surface, pos: list[int], selected: int):
     if selected == 0:
-        pygame.draw.circle(root, Color.GREEN, pos, 5)
+        pygame.draw.circle(root, Color.GREEN, pos, RADIUS)
     elif selected == 1:
-        pygame.draw.circle(root, Color.RED, pos, 5)
+        pygame.draw.circle(root, Color.RED, pos, RADIUS)
 
 
 rrf_starter = False
@@ -67,17 +68,19 @@ while 1:
             x, y = pygame.mouse.get_pos()
             pos = [x, y]
             mouse_handler(screen, pos, selected_count)
-            if selected_count != 2:
-                match selected_count:
-                    case 0:
-                        print(pos)
-                        start = pos
-                    case 1:
-                        print(pos)
-                        end = pos
-                selected_count += 1
-            else:
-                rrf_starter = True
+
+            match selected_count:
+                case 0:
+                    print(pos)
+                    start = pos
+                    selected_count += 1
+                case 1:
+                    print(pos)
+                    end = pos
+                    selected_count += 1
+                case 2:
+                    rrf_starter = True
+                    selected_count = -1
 
     if rrf_starter:
         rrf_starter = False
