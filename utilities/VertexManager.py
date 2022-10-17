@@ -41,9 +41,6 @@ class VertexManager:
 
         if not self.rrf_finisher:
             for vertex in self.vertex_list:
-                if not vertex.children_vertexes:
-                    continue
-
                 for each in vertex.children_vertexes:
                     # print(f"vertex list {self.vertex_list}")
                     pygame.draw.line(
@@ -66,26 +63,29 @@ class VertexManager:
                 pygame.draw.circle(self.root, Color.YELLOW, temp.position.pos, 3)
                 temp = temp.parent_vertex
 
-    def find_closest_vertex(self, new_vertex: Vertex) -> Vertex | None:
-        if len(self.vertex_list) < 1:
-            return None
+    def find_closest_vertex(self, new_vertex: Vertex) -> Vertex:
         key = lambda x: (x - new_vertex).distance
         closest = min(self.vertex_list, key=key)
-        distance = (new_vertex - closest).distance
-        # print(closest.position.pos)
-        # TODO! : distance fazla olursa modifite et!!
-        if distance < self.max_dist:
-            return closest
-        return self.modifier(closest, new_vertex)
 
-    def modifier(self, initial: Vertex, aim: Vertex):
+        return closest
+
+    def __modifier(self, initial: Vertex, aim: Vertex):
         x, y = initial.get_pos()
         direction = initial.position.direction(aim.position)
-        return Vertex(
-            x + direction.x * self.max_dist,
-            y + direction.y * self.max_dist,
+
+        ara_vertex = Vertex(
+            x - int(direction.x * self.max_dist),
+            y - int(direction.y * self.max_dist),
             parent=initial,
         )
+
+        return ara_vertex
+
+    def __control_vertex(self, closest: Vertex, to: Vertex):
+        distance = (to - closest).distance
+        if distance < self.max_dist:
+            return to
+        return self.__modifier(closest, to)
 
     def start_rrf(self, start_point: list[int], end_point: list[int], lock: RLock):
 
@@ -101,10 +101,10 @@ class VertexManager:
 
                     new = Vertex(x, y)
                     closest = self.find_closest_vertex(new)
-                    if closest:
-                        closest.add_child(new)
-                        new.set_parent(closest)
-                        #     continue
+                    new = self.__control_vertex(closest, new)
+                    closest.add_child(new)
+                    new.set_parent(closest)
+                    #     continue
 
                     dist_from_end = sqrt(
                         (pos[0] - end_point[0]) ** 2 + (pos[1] - end_point[1]) ** 2
@@ -112,6 +112,7 @@ class VertexManager:
                     if dist_from_end <= RADIUS:
                         print("endğpos", pos)
                         self.finish(new)
+                        self.add_vertex(new)
                         break
                     self.add_vertex(new)
                     pos = x, y = [randint(0, self.width), randint(0, self.height)]
