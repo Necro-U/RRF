@@ -18,7 +18,7 @@ class VertexManager:
         self.height = height
         self.rrf_finisher = False
         self.aim: Vertex | None = None
-        self.max_dist = 100
+        self.max_dist = 50
 
     def finish(self, vertex: Vertex):
         self.rrf_finisher = True
@@ -112,6 +112,6 @@ class VertexManager:
                     if dist_from_end <= RADIUS:
                         print("endğpos", pos)
                         self.finish(new)
-                    #     break
+                        break
                     self.add_vertex(new)
                     pos = x, y = [randint(0, self.width), randint(0, self.height)]
