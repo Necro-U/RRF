@@ -5,12 +5,12 @@ from utilities.color import Color
 from utilities.grid import Grid
 from pygame.surface import Surface
 from threading import RLock
-from utilities.globals import RADIUS
+from utilities.globals import HEIGHT, RADIUS, WIDTH
 
 
 # TODO Threading eklenmeli
 pygame.init()
-size = width, height = 600, 600
+size = width, height = WIDTH, HEIGHT
 speed = [1, 1]
 black = 0, 0, 0
 start = [0, 0]

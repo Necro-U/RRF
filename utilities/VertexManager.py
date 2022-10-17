@@ -6,7 +6,7 @@ from utilities.vector import Vector
 from utilities.vertex import Vertex
 from pygame.surface import Surface
 from threading import RLock, Thread
-from utilities.globals import RADIUS
+from utilities.globals import MAX_DIST, RADIUS
 import pygame
 
 
@@ -18,7 +18,7 @@ class VertexManager:
         self.height = height
         self.rrf_finisher = False
         self.aim: Vertex | None = None
-        self.max_dist = 50
+        self.max_dist = MAX_DIST
 
     def finish(self, vertex: Vertex):
         self.rrf_finisher = True
@@ -58,9 +58,9 @@ class VertexManager:
                     Color.GREEN,
                     temp.position.pos,
                     temp.parent_vertex.position.pos,
-                    width=2,
+                    width=4,
                 )
-                pygame.draw.circle(self.root, Color.YELLOW, temp.position.pos, 3)
+                pygame.draw.circle(self.root, Color.YELLOW, temp.position.pos, 5)
                 temp = temp.parent_vertex
 
     def find_closest_vertex(self, new_vertex: Vertex) -> Vertex:
@@ -92,13 +92,12 @@ class VertexManager:
         x_s, y_s = start_point
         if not self.rrf_finisher:
             self.vertex_list.append(Vertex(x_s, y_s, isinitial=True))
-            pos = x, y = [randint(0, self.width), randint(0, self.height)]
 
-            while pos != end_point:
+            while True:
                 # sleep(0.1)
 
                 with lock:
-
+                    pos = x, y = [randint(0, self.width), randint(0, self.height)]
                     new = Vertex(x, y)
                     closest = self.find_closest_vertex(new)
                     new = self.__control_vertex(closest, new)
@@ -115,4 +114,3 @@ class VertexManager:
                         self.add_vertex(new)
                         break
                     self.add_vertex(new)
-                    pos = x, y = [randint(0, self.width), randint(0, self.height)]
